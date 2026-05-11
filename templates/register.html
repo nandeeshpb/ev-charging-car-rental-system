@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Register | UNICCARS{% endblock %}
+
+{% block content %}
+<section class="auth-page">
+    {% if verify_mode %}
+        <form class="auth-card reveal" method="POST">
+            <p class="eyebrow">Email verification</p>
+            <h1>Verify OTP</h1>
+            <p class="muted">Enter the 6-digit OTP generated for <strong>{{ email }}</strong>. In this local demo, the OTP is shown in the flash message and terminal.</p>
+
+            <label for="otp">OTP</label>
+            <input id="otp" name="otp" type="text" inputmode="numeric" minlength="6" maxlength="6" placeholder="123456" required>
+
+            <button class="btn btn-primary full" type="submit">Verify Email</button>
+            <a class="btn btn-secondary full" href="{{ url_for('register') }}">Register Again</a>
+        </form>
+    {% else %}
+        <form class="auth-card reveal" method="POST">
+            <p class="eyebrow">Join the platform</p>
+            <h1>Create Account</h1>
+            <p class="muted">Register with email verification before your first login.</p>
+
+            <label for="name">Name</label>
+            <input id="name" name="name" type="text" minlength="3" placeholder="Your name" required>
+
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" placeholder="you@example.com" required>
+
+            <label for="password">Password</label>
+            <input id="password" name="password" type="password" minlength="6" placeholder="Minimum 6 characters" required>
+
+            <button class="btn btn-primary full" type="submit">Generate OTP</button>
+            <p class="form-note">Already verified? <a href="{{ url_for('login') }}">Login</a></p>
+        </form>
+    {% endif %}
+</section>
+{% endblock %}

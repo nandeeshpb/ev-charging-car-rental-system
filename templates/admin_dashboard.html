@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard | UNICCARS{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="reveal">
+        <p class="eyebrow">Admin cockpit</p>
+        <h1>Manage UNICCARS inventory, stations, users, and bookings.</h1>
+    </div>
+    <div class="admin-stats reveal">
+        <div class="metric-card"><span>Cars</span><strong>{{ cars|length }}</strong></div>
+        <div class="metric-card"><span>Stations</span><strong>{{ stations|length }}</strong></div>
+        <div class="metric-card"><span>Users</span><strong>{{ users|length }}</strong></div>
+    </div>
+</section>
+
+<section class="admin-grid">
+    <form class="panel-form reveal" method="POST">
+        <input type="hidden" name="action" value="add_car">
+        <h2>Add Car</h2>
+        <input name="name" type="text" placeholder="Car name" required>
+        <select name="type" required>
+            <option value="">Type</option>
+            <option>SUV</option>
+            <option>Sedan</option>
+            <option>Electric</option>
+        </select>
+        <input name="price" type="number" min="1" step="0.01" placeholder="Price per day" required>
+        <input name="image" type="url" placeholder="Image URL" required>
+        <button class="btn btn-primary full" type="submit">Add Car</button>
+    </form>
+
+    <form class="panel-form reveal" method="POST">
+        <input type="hidden" name="action" value="add_station">
+        <h2>Add Station</h2>
+        <input name="name" type="text" placeholder="Station name" required>
+        <input name="location" type="text" placeholder="City" required>
+        <select name="type" required>
+            <option value="">Charging type</option>
+            <option>Fast</option>
+            <option>Normal</option>
+        </select>
+        <input name="availability" type="number" min="0" placeholder="Availability" required>
+        <div class="form-row">
+            <input name="lat" type="number" step="0.000001" placeholder="Latitude" required>
+            <input name="lng" type="number" step="0.000001" placeholder="Longitude" required>
+        </div>
+        <button class="btn btn-primary full" type="submit">Add Station</button>
+    </form>
+</section>
+
+<section class="section">
+    <div class="section-heading reveal">
+        <p class="eyebrow">Cars</p>
+        <h2>Edit or delete fleet inventory</h2>
+    </div>
+    <div class="admin-list reveal">
+        {% for car in cars %}
+            <form class="edit-row car-edit-row" method="POST" action="{{ url_for('edit_car', car_id=car._id_str) }}">
+                <input name="name" value="{{ car.name }}" required>
+                <select name="type" required>
+                    {% for value in ["SUV", "Sedan", "Electric"] %}
+                        <option value="{{ value }}" {% if car.type == value %}selected{% endif %}>{{ value }}</option>
+                    {% endfor %}
+                </select>
+                <input name="price" type="number" min="1" step="0.01" value="{{ car.price }}" required>
+                <input name="image" type="url" value="{{ car.image }}" required>
+                <button class="btn btn-small" type="submit">Save</button>
+            </form>
+            <form method="POST" action="{{ url_for('delete_car', car_id=car._id_str) }}">
+                <button class="btn danger full" type="submit">Delete {{ car.name }}</button>
+            </form>
+        {% else %}
+            <p class="empty">No cars available.</p>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="section">
+    <div class="section-heading reveal">
+        <p class="eyebrow">Stations</p>
+        <h2>Edit or delete charging stations</h2>
+    </div>
+    <div class="admin-list reveal">
+        {% for station in stations %}
+            <form class="edit-row station-edit-row" method="POST" action="{{ url_for('edit_station', station_id=station._id_str) }}">
+                <input name="name" value="{{ station.name }}" required>
+                <input name="location" value="{{ station.location }}" required>
+                <select name="type" required>
+                    {% for value in ["Fast", "Normal"] %}
+                        <option value="{{ value }}" {% if station.type == value %}selected{% endif %}>{{ value }}</option>
+                    {% endfor %}
+                </select>
+                <input name="availability" type="number" min="0" value="{{ station.availability }}" required>
+                <input name="lat" type="number" step="0.000001" value="{{ station.coordinates.lat }}" required>
+                <input name="lng" type="number" step="0.000001" value="{{ station.coordinates.lng }}" required>
+                <button class="btn btn-small" type="submit">Save</button>
+            </form>
+            <form method="POST" action="{{ url_for('delete_station', station_id=station._id_str) }}">
+                <button class="btn danger full" type="submit">Delete {{ station.name }}</button>
+            </form>
+        {% else %}
+            <p class="empty">No stations available.</p>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="section section-two">
+    <div class="reveal">
+        <div class="section-heading">
+            <p class="eyebrow">Users</p>
+            <h2>All users</h2>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Verified</th></tr></thead>
+                <tbody>
+                    {% for user in users %}
+                        <tr>
+                            <td>{{ user.name }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.role }}</td>
+                            <td>{{ "Yes" if user.verified else "No" }}</td>
+                        </tr>
+                    {% else %}
+                        <tr><td colspan="4">No users found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="reveal">
+        <div class="section-heading">
+            <p class="eyebrow">Bookings</p>
+            <h2>All bookings</h2>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>User</th><th>Car</th><th>Station</th><th>Date</th></tr></thead>
+                <tbody>
+                    {% for booking in bookings %}
+                        <tr>
+                            <td>{{ booking.user.name }}</td>
+                            <td>{{ booking.car.name }}</td>
+                            <td>{{ booking.station.name }}</td>
+                            <td>{{ booking.date }}</td>
+                        </tr>
+                    {% else %}
+                        <tr><td colspan="4">No bookings found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}

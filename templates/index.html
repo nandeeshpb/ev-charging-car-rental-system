@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}UNICCARS - EV Charging & Car Rental Platform{% endblock %}
+
+{% block content %}
+<section class="hero parallax-section" id="home">
+    <div class="hero-overlay"></div>
+    <div class="hero-content reveal">
+        <p class="eyebrow">Premium electric mobility</p>
+        <h1>UNICCARS - EV Charging & Car Rental Platform</h1>
+        <p>Explore charging stations, premium rental cars, map-powered EV discovery, and a seamless booking flow built for real-world travel.</p>
+        <div class="hero-actions">
+            <a class="btn btn-primary smooth-link" href="{{ url_for('dashboard') if current_user else url_for('register') }}">Explore EV</a>
+            <a class="btn btn-secondary smooth-link" href="#stations">View Stations</a>
+        </div>
+    </div>
+    <div class="hero-stats reveal">
+        <div class="metric-card">
+            <span>EV Stations</span>
+            <strong>{{ stations|length }}+</strong>
+        </div>
+        <div class="metric-card">
+            <span>Rental Cars</span>
+            <strong>{{ cars|length }}+</strong>
+        </div>
+        <div class="hero-badge">
+            <span class="pulse-dot"></span>
+            Live Data 
+        </div>
+    </div>
+</section>
+
+<section class="section section-split" id="stations">
+    <div class="reveal">
+        <p class="eyebrow">Charging network</p>
+        <h2>Find nearby EV charging before the battery gets nervous.</h2>
+        <p class="muted">UNICCARS combines station availability, city location, charger type, and an embedded Google map for faster trip decisions.</p>
+        <a class="btn btn-primary" href="{{ url_for('book_slot') if current_user else url_for('login') }}">Reserve Slot</a>
+    </div>
+    <div class="map-card reveal">
+        <iframe src="https://www.google.com/maps?q=EV+charging+station+near+me&output=embed" loading="lazy" title="Nearby EV charging stations"></iframe>
+    </div>
+</section>
+
+<section class="section" id="station-cards">
+    <div class="section-heading reveal">
+        <p class="eyebrow">EV stations</p>
+        <h2>Fast and normal charging hubs</h2>
+    </div>
+    <div class="station-card-grid">
+        {% for station in stations %}
+            <article class="station-card reveal">
+                <div class="station-icon">EV</div>
+                <span class="pill">{{ station.type }} Charging</span>
+                <h3>{{ station.name }}</h3>
+                <p class="muted">{{ station.location }}</p>
+                <div class="station-meta">
+                    <span>{{ station.availability }} slots</span>
+                    <span>{{ station.coordinates.lat }}, {{ station.coordinates.lng }}</span>
+                </div>
+            </article>
+        {% else %}
+            <p class="empty">Start MongoDB to load sample stations.</p>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="section" id="cars">
+    <div class="section-heading reveal">
+        <p class="eyebrow">Rental garage</p>
+        <h2>Cars with presence, comfort, and clean energy options</h2>
+    </div>
+    <div class="card-grid">
+        {% for car in cars %}
+            <article class="car-card reveal">
+                <img src="{{ car.image }}" alt="{{ car.name }}">
+                <div class="card-body">
+                    <span class="pill">{{ car.type }}</span>
+                    <h3>{{ car.name }}</h3>
+                    <p class="price">Rs. {{ "%.0f"|format(car.price) }} / day</p>
+                </div>
+            </article>
+        {% else %}
+            <p class="empty">Start MongoDB to load sample cars.</p>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="cta-band reveal">
+    <div>
+        <p class="eyebrow">Ready to move</p>
+        <h2>Book your car and charging station in one flow.</h2>
+    </div>
+    <a class="btn btn-primary" href="{{ url_for('book_slot') if current_user else url_for('register') }}">Start Booking</a>
+</section>
+{% endblock %}

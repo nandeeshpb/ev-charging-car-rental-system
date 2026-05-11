@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Book Slot | UNICCARS{% endblock %}
+
+{% block content %}
+<section class="auth-page booking-page">
+    <form class="auth-card booking-card reveal" method="POST">
+        <p class="eyebrow">Reservation studio</p>
+        <h1>Book your EV-ready trip</h1>
+        <p class="muted">Choose the car, charging station, and date. Station availability updates after confirmation.</p>
+
+        <label for="car_id">Select Car</label>
+        <select id="car_id" name="car_id" required>
+            <option value="">Choose a car</option>
+            {% for car in cars %}
+                <option value="{{ car._id_str }}">{{ car.name }} - {{ car.type }} - Rs. {{ "%.0f"|format(car.price) }}/day</option>
+            {% endfor %}
+        </select>
+
+        <label for="station_id">Select Station</label>
+        <select id="station_id" name="station_id" required>
+            <option value="">Choose a station</option>
+            {% for station in stations %}
+                <option value="{{ station._id_str }}" {% if station.availability <= 0 %}disabled{% endif %}>
+                    {{ station.name }} - {{ station.location }} - {{ station.type }} - {{ station.availability }} slots
+                </option>
+            {% endfor %}
+        </select>
+
+        <label for="date">Date</label>
+        <input id="date" name="date" type="date" required>
+
+        <button class="btn btn-primary full" type="submit">Confirm Booking</button>
+        <a class="btn btn-secondary full" href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+    </form>
+</section>
+{% endblock %}

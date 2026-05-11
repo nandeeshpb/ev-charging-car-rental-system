@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard | UNICCARS{% endblock %}
+
+{% block content %}
+<section class="hero dashboard-hero parallax-section" id="dashboard-top">
+    <div class="hero-overlay"></div>
+    <div class="hero-content reveal">
+        <p class="eyebrow">Welcome, {{ current_user.name }}</p>
+        <h1>Your electric journey command center.</h1>
+        <p>Browse stations, inspect cars, reserve a route-ready pair, and track your booking history in a smooth scrolling dashboard.</p>
+        <div class="hero-actions">
+            <a class="btn btn-primary smooth-link" href="#booking">Book Now</a>
+            <a class="btn btn-secondary smooth-link" href="#history">History</a>
+        </div>
+    </div>
+</section>
+
+<section class="section section-split" id="stations">
+    <div class="reveal">
+        <p class="eyebrow">Section 2</p>
+        <h2>EV Charging Stations</h2>
+        <p class="muted">Availability-aware station cards with Google Maps nearby EV station discovery.</p>
+    </div>
+    <div class="map-card reveal">
+        <iframe src="https://www.google.com/maps?q=EV+charging+station+near+me&output=embed" loading="lazy" title="Nearby EV charging stations"></iframe>
+    </div>
+</section>
+
+<section class="section">
+    <div class="station-card-grid">
+        {% for station in stations %}
+            <article class="station-card reveal">
+                <div class="station-icon">EV</div>
+                <span class="pill">{{ station.type }}</span>
+                <h3>{{ station.name }}</h3>
+                <p class="muted">{{ station.location }}</p>
+                <div class="station-meta">
+                    <span>{{ station.availability }} available</span>
+                    <span>{{ station.coordinates.lat }}, {{ station.coordinates.lng }}</span>
+                </div>
+            </article>
+        {% else %}
+            <p class="empty">No stations found.</p>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="section" id="cars">
+    <div class="section-heading reveal">
+        <p class="eyebrow">Section 3</p>
+        <h2>Cars</h2>
+    </div>
+    <div class="card-grid">
+        {% for car in cars %}
+            <article class="car-card reveal">
+                <img src="{{ car.image }}" alt="{{ car.name }}">
+                <div class="card-body">
+                    <span class="pill">{{ car.type }}</span>
+                    <h3>{{ car.name }}</h3>
+                    <p class="price">Rs. {{ "%.0f"|format(car.price) }} / day</p>
+                    <a class="btn btn-primary full" href="{{ url_for('book_slot') }}">Book</a>
+                </div>
+            </article>
+        {% else %}
+            <p class="empty">No cars found.</p>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="section section-split" id="booking">
+    <div class="reveal">
+        <p class="eyebrow">Section 4</p>
+        <h2>Booking</h2>
+        <p class="muted">Select a car, station, and travel date on one dedicated booking screen.</p>
+    </div>
+    <div class="booking-preview reveal">
+        <h3>Quick reservation</h3>
+        <p class="muted">One booking creates a linked rental and charging reservation.</p>
+        <a class="btn btn-primary full" href="{{ url_for('book_slot') }}">Open Booking Form</a>
+    </div>
+</section>
+
+<section class="section" id="history">
+    <div class="section-heading reveal">
+        <p class="eyebrow">Section 5</p>
+        <h2>Booking History</h2>
+    </div>
+    <div class="table-wrap reveal">
+        <table>
+            <thead>
+                <tr>
+                    <th>Car</th>
+                    <th>Station</th>
+                    <th>Date</th>
+                    <th>Booked On</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings %}
+                    <tr>
+                        <td>{{ booking.car.name }}</td>
+                        <td>{{ booking.station.name }} - {{ booking.station.location }}</td>
+                        <td>{{ booking.date }}</td>
+                        <td>{{ booking.created_at.strftime("%d %b %Y") if booking.created_at else "N/A" }}</td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="4">No bookings yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}
